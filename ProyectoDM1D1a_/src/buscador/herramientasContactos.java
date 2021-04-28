@@ -1,63 +1,15 @@
 package buscador;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import bbdd.conexionBD;
-import contactos.contacto;
+import objetos.aficion;
+import objetos.contacto;
 
 public class herramientasContactos {
 	
-	public static void buscarContacto(String nombre) {
-		conexionBD con = new conexionBD();
-        con.connect();
-        ArrayList<contacto> contactos = con.buscarContacto(nombre);
-        
-        for (contacto Contacto : contactos) {
-        	System.out.print("ID: ");
-			System.out.println(Contacto.getId());
-
-			System.out.print("Nombre: ");
-			System.out.println(Contacto.getNombre());
-
-			System.out.print("Telefono: ");
-			System.out.println(Contacto.getTelefono());
-			
-			System.out.print("Aficiones: ");
-			System.out.println(Contacto.getAficiones());
-
-			System.out.println("=======================");
-		}
-        contactos.clear();
-	}
-	
-//	public static contacto obtenerContacto() {
-//		
-//	}
-	
-	public static void mostrarContactos() {
-		conexionBD con = new conexionBD();
-        con.connect();
-        con.mostrarContactos();
-        con.close();
-	}
-	
-	public static void selectCont(int i ) {
-		conexionBD con = new conexionBD();
-        con.connect();
-        contacto cont = con.mostrarContactoSing(i);
-        System.out.print("ID: ");
-		System.out.println(cont.getId());
-
-		System.out.print("Nombre: ");
-		System.out.println(cont.getNombre());
-
-		System.out.print("Telefono: ");
-		System.out.println(cont.getTelefono());
-		
-		System.out.print("Aficiones: ");
-		System.out.println(cont.getAficiones());
-        con.close();
-	}
+	static Scanner sc = new Scanner(System.in);
 	
 	public static void deleteCont(int i) {
 		conexionBD con = new conexionBD();
@@ -73,17 +25,123 @@ public class herramientasContactos {
         con.close();
 	}
 	
-	public static void cambiarTelefono(int i,String nombre) {
+	//Nuevos metodos ..............................................................................................................................
+	
+	public static void crearContacto() {
+		boolean vuelta = true;
 		conexionBD con = new conexionBD();
         con.connect();
-        con.actualizarTelefono(i, nombre);
+        //Primer paso crear contacto con nombre en la tabla contacto y nos quedamos con el id de contacto añadido
+		System.out.println("Introduzca un nombre:");
+		String nombre = sc.nextLine();
+		int id_contacto = con.saveContacto(nombre);
+		//Segundo paso añadir tantos telefonos como quiera el usuario minimo 1 en la tabla telefono con el id del usuario.
+		while (vuelta) {
+			System.out.println("Introduzca un telefono: ");
+			nombre = sc.nextLine();
+			System.out.println("Ha introducido "+nombre+" ¿Quiere guardar? S/N");
+			char c = sc.next().charAt(0);
+			sc.nextLine();
+			if (c == 's' || c == 'S') {
+				con.saveTelefono(id_contacto, nombre);
+				sc.nextLine();
+				System.out.println("¿Quiere agregar otro telefono? S/N");
+				c = sc.next().charAt(0);
+				sc.nextLine();
+				if (c == 'n' || c == 'N') {
+					vuelta = false;
+				}
+			}
+		}
+		System.out.println("¿Quiere añadir aficiones? S/N");
+		char c = sc.next().charAt(0);
+		sc.nextLine();
+		if (c == 's' || c == 'S') {
+			ArrayList<aficion> aficiones = con.verAficiones();
+			boolean crearaficion = true;
+			if (aficiones.size() == 0) {
+				System.out.println("No se han encontrado aficiones debe crear una aficion.");
+				while (crearaficion) {
+					System.out.println("Introduzca Aficion:");
+					con.crearAficion(sc.next());
+					sc.nextLine();
+					System.out.println("¿Quiere añadir más aficiones? S/N");
+					c = sc.next().charAt(0);
+					sc.nextLine();
+					if ( c == 'n' || c == 'N')
+						crearaficion = false;
+				}
+				aficiones = con.verAficiones();
+			}
+			for (aficion aficion : aficiones) {
+				System.out.print("ID: ");
+				System.out.println(aficion.getId());
+				System.out.print("Nombre: ");
+				System.out.println(aficion.getNombre());
+			}
+			System.out.println("¿Quiere añadir más aficiones? S/N");
+			c = sc.next().charAt(0);
+			sc.nextLine();
+			if (c == 's' || c == 'S') {
+				while (crearaficion) {
+					System.out.println("Introduzca Aficion:");
+					con.crearAficion(sc.next());
+					sc.nextLine();
+					System.out.println("¿Quiere añadir más aficiones? S/N");
+					c = sc.next().charAt(0);
+					sc.nextLine();
+					if ( c == 'n' || c == 'N')
+						crearaficion = false;
+				}
+			}
+			System.out.println("Introduzca todos los ids que quiere añadir: ");
+			String[] ids = sc.nextLine().split(" ");
+			for (String id : ids) {
+				con.saveAficionContacto(id_contacto, Integer.parseInt(id));
+			}
+		}
+		ArrayList<contacto> nuevoContacto = con.buscarContactoId(id_contacto);
+		for (contacto contacto : nuevoContacto) {
+			System.out.println(contacto.toString());
+		}
+		System.out.println("¿Quiere guardar este contacto? S/N");
+		c = sc.next().charAt(0);
+		sc.nextLine();
+		if ( c == 'n' || c == 'N')
+			con.deleteCont(id_contacto);
+		con.close();
+	}
+	
+	public static void buscarContactos(String nombre) {
+		conexionBD con = new conexionBD();
+        con.connect();
+        ArrayList<contacto> contactos= con.buscarContacto(nombre);
+        
+        for (contacto contacto : contactos) {
+			System.out.println(contacto.toString());
+		}
+        
         con.close();
 	}
 	
-	public static void cambiarAficion(int i,String nombre) {
+	public static void buscarContactosId(int i) {
 		conexionBD con = new conexionBD();
         con.connect();
-        con.actualizarAficiones(i, nombre);
+        ArrayList<contacto> contactos = con.buscarContactoId(i);
+        for (contacto contacto : contactos) {
+			System.out.println(contacto.toString());
+		}
+        con.close();
+	}
+	
+	public static void verContactos() {
+		String str = "";
+		conexionBD con = new conexionBD();
+        con.connect();
+        ArrayList<contacto> contactos = con.buscarContacto(str);
+        for (contacto contacto : contactos) {
+			System.out.println(contacto.toString());
+		}
         con.close();
 	}
 }

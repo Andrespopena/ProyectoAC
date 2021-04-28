@@ -3,13 +3,15 @@ package menuPrincipal;
 import java.util.Scanner;
 
 import ValidacionDatos.VD;
+import bbdd.conexionBD;
 import buscador.herramientasContactos;
-import contactos.contacto;
+import objetos.contacto;
 
 public class recursosMenu {
-	static boolean bucle = true; 
-	static Scanner sc = new Scanner(System.in);
+	static boolean bucle = true;
 	static int menuPrincial() {
+		int aux = 0;
+		Scanner sc = new Scanner(System.in);
 		System.out.println("+=========== Menú ============+");
 		System.out.println("1. Ver contactos.");
 		System.out.println("2. Añadir contacto.");
@@ -17,54 +19,41 @@ public class recursosMenu {
 		System.out.println("4. Modificar Contacto");
 		System.out.println("5. Salir.");
 		System.out.println("+=========== Menú ============+");
-		System.out.println("Seleccione una opción: ");
-		return VD.VDInt();
+		try {
+			System.out.println("Seleccione una opcion: ");
+			aux = sc.nextInt();
+		} catch (Exception e) {
+			System.err.println("Dato erroneo.");
+		}
+		return aux;
 	}
 	
 	static void verContactos() {
 		System.out.println();
 		System.out.println("+=========== Ver contactos ============+");
-		herramientasContactos.mostrarContactos();
-		System.out.println("para continuar pulse cualquier tecla...");
+		herramientasContactos.verContactos();
+		System.out.println();
 	}
 	
-	static boolean anadirContacto() {
+	static void anadirContacto() {
+		Scanner sc = new Scanner(System.in);
 		System.out.println("+=========== Añadir contacto ============+");
-		System.out.println();
-		System.out.println("Introduzca Nombre: ");
-		String nombre = sc.next();
-		System.out.println("Introduzca Telefono: ");
-		String telefono = sc.next();
-		System.out.println("Introduzca Aficiones: ");
-		String aficiones = sc.next();
-		contacto cont = new contacto(nombre, telefono, aficiones);
-		System.out.print("¿Quiere guardar el siguiente contacto?:\n" + "Nombre: " + nombre + "\n"
-				+ "Telefono: " + telefono + "\n" + "Aficiones: " + aficiones + "\n" + "\n" + "[S/N]");
-		char c = sc.next().charAt(0);
-		if (c == 'S' || c == 's') {
-			cont.save();
-			bucle = false;
-		} else {
-			System.out.println("¿Quiere salir sin guardar? S/N");
-			if (sc.next().charAt(0) == 'S' || sc.next().charAt(0) == 's') {
-				bucle = false;
-			}
-		}
-		
-		return bucle;
+		herramientasContactos.crearContacto();
+		System.out.println("+=========== =============== ============+");
 	}
 	
 	static void eliminarContacto() {
+		Scanner sc = new Scanner(System.in);
 		System.out.println();
 		System.out.println("+=========== Eliminar contacto ============+");
 		System.out.println("Buscar contacto que quiere eliminar: ");
 		String nombre = sc.next();
 		System.out.println("======= Resultados =======");
-		herramientasContactos.buscarContacto(nombre);
+		herramientasContactos.buscarContactos(nombre);
 		System.out.println("Seleciona ID: ");
 		int i = sc.nextInt();
 		System.out.println("Ha seleccionado: ");
-		herramientasContactos.selectCont(i);
+		herramientasContactos.buscarContactosId(i);
 		System.out.println("¿Desea eliminar? S/N");
 		char c = sc.next().charAt(0);
 		if (c == 'S' || c == 's') {
@@ -73,20 +62,24 @@ public class recursosMenu {
 	}
 	
 	static void modificarContacto() {
+		conexionBD con = new conexionBD();
+        con.connect();
+		Scanner sc = new Scanner(System.in);
 		System.out.println();
 		System.out.println("+=========== Actualizar contacto ============+");
 		System.out.println("Buscar contacto que quiere actualizar: ");
 		String nombre = sc.next();
 		System.out.println("======= Resultados =======");
-		herramientasContactos.buscarContacto(nombre);
+		herramientasContactos.buscarContactos(nombre);
 		System.out.println("Seleciona ID: ");
 		int i = sc.nextInt();
 		System.out.println("Ha seleccionado: ");
-		herramientasContactos.selectCont(i);
+		herramientasContactos.buscarContactosId(i);
 		System.out.println("¿Qué quiere actualizar?\n"
 				+"1. Nombre\n"
 				+"2. Telefono\n"
-				+"3. Aficiones");
+				+"3. Aficiones"
+				+"4. Ninguna");
 		int optionMod = sc.nextInt();
 		switch (optionMod) {
 		case 1: {
@@ -96,17 +89,34 @@ public class recursosMenu {
 			break;
 		}
 		case 2: {
-			System.out.println("Telefono: ");
-			String nueNombre = sc.next();
-			herramientasContactos.cambiarTelefono(i, nueNombre);
+			System.out.println("¿Añadir. modificar o eliminar? 1.2.3");
+			int op = sc.nextInt();
+			switch (op) {
+			case 1: {
+				System.out.println("Nuevo telefono: ");
+				String nueTelefono = sc.next();
+				con.saveTelefono(1, nueTelefono);
+				break;
+			}
+			case 2: {
+				
+				break;
+			}
+			case 3: {
+				break;
+			}
+			}
 			break;
 		}
 		case 3: {
 			System.out.println("Aficion: ");
-			String nueNombre = sc.next();
-			herramientasContactos.cambiarAficion(i, nueNombre);
+			
+			break;
+		}
+		case 4: {
 			break;
 		}
 		}
+		con.close();
 	}
 }
