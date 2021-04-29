@@ -12,7 +12,7 @@ public class Principal {
 		/**
 		 * Aqui empieza el programa cargando el menú.
 		 */
-		while (opcion != 5) {
+		while (opcion != 7) {
 			/**
 			 * El metodo menuPrincipal imprime las diferentes opcines lee la opcion que introduce el usuario y la devuelve para cargarla en el switch.
 			 */
@@ -41,6 +41,18 @@ public class Principal {
 				 * opcion para modificar contacto ya existente
 				 */
 				recursosMenu.modificarContacto();
+				break;
+			case 5:
+				/**
+				 * opcion para añadir aficiones sin crear contacto.
+				 */
+				recursosMenu.crearAficiones();
+				break;
+			case 6:
+				/**
+				 * opcion para borrar toda la BBDD.
+				 */
+				recursosMenu.borrarBBDD();
 				break;
 			}
 		}

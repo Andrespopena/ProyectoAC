@@ -79,7 +79,7 @@ public class herramientasContactos {
 				System.out.print("Nombre: ");
 				System.out.println(aficion.getNombre());
 			}
-			System.out.println("¿Quiere añadir más aficiones? S/N");
+			System.out.println("¿Quiere añadir alguna aficion que no exista? S/N");
 			c = sc.next().charAt(0);
 			sc.nextLine();
 			if (c == 's' || c == 'S') {
